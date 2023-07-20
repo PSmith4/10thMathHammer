@@ -278,12 +278,36 @@ class Weapon():
             wound_prob=2.0/6.0
         
         
-        wounds=np.zeros((hit_array.shape[0],hit_array.shape[0]))
         
         if self. lethal_hit:
-            asdf
-        
+            # print(hit_array)
+            print(crits)
+            wounds=np.zeros((hit_array.shape[0],hit_array.shape[0],hit_array.shape[0])) #dice to roll, sucesses, auto wounds
+            
+            for rolls in range(hit_array.shape[0]):            
+              for auto_wound in range(i):            
+                # up= np.tile(np.linspace(0.0,rolls,rolls+1, endpoint=True),   (hit_array.shape[0],1 ) ) 
+                 
+                up= np.linspace(0.0,rolls-auto_wound,rolls+1-auto_wound, endpoint=True)
+                down=np.flip(up)   
+                fa=fact_array(rolls-auto_wound)
+                # print(up, (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa))
+                # for auto_wounds in range(hit_array.shape[0]):      
+                # print(up.shape, crits[rolls].shape, down.shape, fa)
+                # print((crits[rolls]* (1-wound_prob)**(down)).shape)
+                wounds[auto_wound, :rolls+1,rolls]=  crits[rolls,auto_wound]* (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa)
+                    # print(rolls,"wounds", wounds)
+            if self.devastating_wound:
+                asdf
+            else:
+                print("wounds")
+                print(wounds)
+                wounds_temp=wounds=np.zeros((hit_array.shape[0],hit_array.shape[0]))
+                for auto_wound in range(hit_array.shape[0]):            
+                    wounds_temp+= wounds[:,:, ]
         else:
+            wounds=np.zeros((hit_array.shape[0],hit_array.shape[0])) #dice to roll, successes
+
             for rolls in range(hit_array.shape[0]):            
                 up= np.linspace(0.0,rolls,rolls+1, endpoint=True)
                 down=np.flip(up)   
@@ -291,11 +315,16 @@ class Weapon():
                 # print(up, (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa))
                 wounds[:rolls+1,rolls]=  hit_array[rolls]* (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa)
                 # print(rolls,"wounds", wounds)
-                
-        wounds = np.sum(wounds, axis=1)
-        print("wounds compressed", wounds)
-        assert np.sum(wounds)==1.0
         
+
+            if self.devastating_wound:
+                asdf
+            else:         
+                print("wounds",wounds)
+                wounds = np.sum(wounds, axis=1)
+                print("wounds compressed", wounds)
+                assert np.sum(wounds)==1.0
+                return wounds
         
         
 def load_weapons(file):
