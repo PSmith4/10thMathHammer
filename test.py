@@ -6,7 +6,7 @@ ui.label('Hello NiceGUI!')
 enahm_toughness= 4
 
 bolter1=Weapon( ['2','3','4','0','1',''])
-bolter2=Weapon( ['2','3','4','0','1','sustained hit 2'])
+bolter2=Weapon( ['2','3','4','0','1','sustained hit 1'])
 bolter3=Weapon( ['2','3','4','0','1','lethal hit'])
 bolter4=Weapon( ['2','3','4','0','1','lethal hit sustained hit 1'])
 

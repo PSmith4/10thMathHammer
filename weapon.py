@@ -225,7 +225,7 @@ class Weapon():
                         crits2[ i+ j*extra,  j ] =  crits[i,j]
                 # print(crits)
                 # print()
-                # print(crits2)
+                # print("crits"crits2)
                 return hits, crits2
             elif self.sustained_hit[0]:
                 extra=self.sustained_hit[1]
@@ -256,7 +256,7 @@ class Weapon():
                 # print("hits",hits, np.sum(hits))
                 return hits, crits
                 
-        print("hits",hits, np.sum(hits))
+        # print("hits",hits, np.sum(hits))
         assert np.sum(hits)==1.0
         return hits ,None
     
@@ -281,30 +281,42 @@ class Weapon():
         
         if self. lethal_hit:
             # print(hit_array)
-            print(crits)
-            wounds=np.zeros((hit_array.shape[0],hit_array.shape[0],hit_array.shape[0])) #dice to roll, sucesses, auto wounds
+            print("crit",crits)
+            wounds=np.zeros((crits.shape[1],crits.shape[0],crits.shape[0])) #dice to roll, sucesses, auto wounds
             
-            for rolls in range(hit_array.shape[0]):            
-              for auto_wound in range(i):            
+            for rolls in range(crits.shape[0]):            
+              for auto_wound in range( min(rolls+1, crits.shape[1])):            
                 # up= np.tile(np.linspace(0.0,rolls,rolls+1, endpoint=True),   (hit_array.shape[0],1 ) ) 
                  
                 up= np.linspace(0.0,rolls-auto_wound,rolls+1-auto_wound, endpoint=True)
                 down=np.flip(up)   
                 fa=fact_array(rolls-auto_wound)
-                # print(up, (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa))
-                # for auto_wounds in range(hit_array.shape[0]):      
-                # print(up.shape, crits[rolls].shape, down.shape, fa)
-                # print((crits[rolls]* (1-wound_prob)**(down)).shape)
-                wounds[auto_wound, :rolls+1,rolls]=  crits[rolls,auto_wound]* (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls)/fa/np.flip(fa)
-                    # print(rolls,"wounds", wounds)
+                # print((crits[rolls,auto_wound]* (1-wound_prob)**(down)).shape)
+                # print( (wound_prob**(up)).shape )
+                # print( (fact(rolls-auto_wound)/fa/np.flip(fa)).shape)
+                # print(wounds[auto_wound, :rolls+1,rolls].shape)
+                
+                wounds[auto_wound, :rolls+1-auto_wound, rolls-auto_wound]=  crits[rolls,auto_wound]* (1-wound_prob)**(down)* wound_prob**(up)* fact(rolls-auto_wound)/fa/np.flip(fa)
+                print(rolls, auto_wound, wounds[auto_wound, :rolls+1-auto_wound,rolls-auto_wound])
+                # print(rolls,"wounds", wounds)
             if self.devastating_wound:
                 asdf
             else:
-                print("wounds")
+                # print("wounds")
                 print(wounds)
-                wounds_temp=wounds=np.zeros((hit_array.shape[0],hit_array.shape[0]))
-                for auto_wound in range(hit_array.shape[0]):            
-                    wounds_temp+= wounds[:,:, ]
+                
+                wounds_temp = wounds[0 ]
+                for auto_wound in range(1,hit_array.shape[0]):
+                    # print("-")
+                    # print(wounds[auto_wound,:-auto_wound, auto_wound: ])
+                    wounds_temp[ auto_wound: ] = wounds_temp[ auto_wound:]+ wounds[auto_wound, :-auto_wound ]
+                wounds= wounds_temp
+                
+                print("wounds",wounds)
+                wounds = np.sum(wounds, axis=1)
+                print("wounds compressed", wounds)
+                assert np.sum(wounds)==1.0
+                return wounds
         else:
             wounds=np.zeros((hit_array.shape[0],hit_array.shape[0])) #dice to roll, successes
 
